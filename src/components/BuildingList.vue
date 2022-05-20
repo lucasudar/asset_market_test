@@ -1,13 +1,12 @@
 <template>
   <div class="table">
     <h1>{{ msg }}</h1>
-    <b-table striped hover :items="buildings"
+    <b-table class="buildings" striped hover :items="buildings"
              :fields="fields"
              :select-mode="selectMode"
              responsive="sm"
              ref="selectableTable"
-             selectable
-             @row-selected="onRowSelected"
+             @row-clicked="onRowSelected"
     ></b-table>
   </div>
 </template>
@@ -178,17 +177,17 @@ export default {
         }
       ],
       selectMode: 'single',
-      filteredArray: [],
     }
   },
   methods: {
     onRowSelected(items) {
-      let xBuilding = items[0].x
-      let yBuilding = items[0].y
-      let result = this.towers.map(tower => {
-        let xTower = tower.x
-        let yTower = tower.y
-        let distance = Math.sqrt(Math.pow(xTower - xBuilding, 2) + Math.pow(yTower - yBuilding, 2)).toFixed(2)
+      const xBuilding = items.x
+      const yBuilding = items.y
+
+      const result = this.towers.map(tower => {
+        const xTower = tower.x
+        const yTower = tower.y
+        const distance = Math.sqrt(Math.pow(xTower - xBuilding, 2) + Math.pow(yTower - yBuilding, 2)).toFixed(2)
         return {
           "type": tower.type,
           "id": tower.id,
@@ -198,16 +197,18 @@ export default {
           "distance": distance
         }
       }).sort((a, b) => a.distance - b.distance)
-      this.filteredArray = result
-      this.$bvModal.msgBoxOk(`${this.filteredArray[0].name} is the closest to the building.
-      Coordinates: X:${this.filteredArray[0].x} Y:${this.filteredArray[0].y}
-      Distance: ${this.filteredArray[0].distance}`, {
+
+      const text = `${result[0].name} is the closest to the building.
+        Coordinates: X:${result[0].x} Y:${result[0].y}
+        Distance: ${result[0].distance}`
+
+      this.$bvModal.msgBoxOk(text, {
         title: 'The closest cell tower:',
         size: 'lg',
         buttonSize: 'lg',
         okVariant: 'success',
-        headerClass: 'p-2 border-bottom-0',
-        footerClass: 'p-2 border-top-0',
+        headerClass: 'p-3 border-bottom-0',
+        footerClass: 'p-1 border-top-0',
         centered: true
       })
     },
@@ -215,23 +216,8 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
+<style>
+.buildings tr {
+  cursor: pointer;
 }
 </style>
